@@ -1,6 +1,6 @@
 name: internet_connection_monitor
-description: Framework-independent Internet reachability monitoring with HTTP fallback probes, confirmed offline transitions, periodic recovery and injectable checks.
-version: 0.1.1
+description: Una librería para apps Dart y Flutter que comprueba si hay Internet y avisa cuando la conexión se pierde o vuelve, con revisiones periódicas y reintentos.
+version: 0.1.2
 homepage: https://victorf.dev/projects/internet-connection-monitor
 repository: https://github.com/victorcode1/internet-connection-monitor
 issue_tracker: https://github.com/victorcode1/internet-connection-monitor/issues
