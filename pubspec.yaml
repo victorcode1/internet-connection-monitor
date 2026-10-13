@@ -1,11 +1,11 @@
 name: internet_connection_monitor
 description: Framework-independent Internet reachability monitoring with HTTP fallback probes, confirmed offline transitions, periodic recovery and injectable checks.
-version: 0.1.0
-homepage: https://victorf.dev
+version: 0.1.1
+homepage: https://victorf.dev/projects/internet-connection-monitor
 repository: https://github.com/victorcode1/internet-connection-monitor
 issue_tracker: https://github.com/victorcode1/internet-connection-monitor/issues
 environment:
-  sdk: '>=3.5.0 <4.0.0'
+  sdk: ">=3.5.0 <4.0.0"
 dependencies:
   http: ^1.6.0
 dev_dependencies:
