@@ -4,8 +4,6 @@ A Dart package for confirmed Internet reachability, with HTTP fallback checks,
 periodic recovery and no Flutter or state-management dependency.
 
 The source is available on [GitHub](https://github.com/victorcode1/internet-connection-monitor).
-Version 0.1.0 is prepared for its first pub.dev release. It has not yet
-been published. Use a Git dependency pinned to a reviewed commit until that release is available.
 
 ## Why use it?
 
@@ -27,20 +25,20 @@ Intervals are measured **after** each check completes. Each default endpoint
 can take up to 4 seconds; the whole monitor check is bounded to 10 seconds.
 Detection time includes request duration and the confirmation delay.
 
-## Installation before pub.dev publication
+## Installation
+
+```sh
+dart pub add internet_connection_monitor
+```
+
+Or add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  internet_connection_monitor:
-    git:
-      url: https://github.com/victorcode1/internet-connection-monitor.git
-      ref: <commit-sha>
+  internet_connection_monitor: ^0.1.0
 ```
 
-Replace `<commit-sha>` with the complete commit SHA you intend to use.
 For local development, a `path: ../internet-connection-monitor` dependency also works.
-
-After the first pub.dev release, use `internet_connection_monitor: ^0.1.0`.
 
 ## Usage
 
