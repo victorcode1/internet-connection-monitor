@@ -1,6 +1,6 @@
 name: internet_connection_monitor
 description: Una librería para apps Dart y Flutter que comprueba si hay Internet y avisa cuando la conexión se pierde o vuelve, con revisiones periódicas y reintentos.
-version: 0.1.2
+version: 0.1.3
 homepage: https://victorf.dev/projects/internet-connection-monitor
 repository: https://github.com/victorcode1/internet-connection-monitor
 issue_tracker: https://github.com/victorcode1/internet-connection-monitor/issues

@@ -45,7 +45,7 @@ También puedes añadirla a tu archivo `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  internet_connection_monitor: ^0.1.2
+  internet_connection_monitor: ^0.1.3
 ```
 
 ## Un ejemplo para empezar
@@ -116,10 +116,159 @@ Los nombres que aparecen en el código significan lo siguiente:
 | `online`            | Al menos una dirección de Internet respondió como se esperaba.                    |
 | `offline`           | Las revisiones fallaron las veces necesarias para confirmar la falta de conexión. |
 
-## ¿Puedo usarla en Flutter?
+## Ejemplo en Flutter: mostrar «Sin Internet»
 
-Sí. Puedes mostrar los avisos en tus pantallas y elegir cómo reaccionan tus botones.
-La librería no trae pantallas ni te obliga a usar una forma concreta de organizar tu app.
+Este ejemplo muestra un aviso arriba de tu pantalla cuando se pierde Internet.
+Cuando vuelve la conexión, el aviso desaparece. El botón **«Reintentar»** pide
+una nueva revisión.
+
+### 1. Añade la librería
+
+Dentro de tu proyecto Flutter, ejecuta:
+
+```sh
+flutter pub add internet_connection_monitor
+```
+
+### 2. Crea el widget del aviso
+
+Crea el archivo `lib/aviso_de_internet.dart` y pega este código:
+
+```dart
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:internet_connection_monitor/internet_connection_monitor.dart';
+
+class AvisoDeInternet extends StatefulWidget {
+  const AvisoDeInternet({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  State<AvisoDeInternet> createState() => _AvisoDeInternetState();
+}
+
+class _AvisoDeInternetState extends State<AvisoDeInternet>
+    with WidgetsBindingObserver {
+  final _monitor = InternetConnectionMonitor();
+  late final StreamSubscription<InternetStatus> _escucha;
+  InternetStatus _estado = InternetStatus.unknown;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    // Escuchamos antes de empezar las comprobaciones.
+    _escucha = _monitor.changes.listen((estado) {
+      if (!mounted) return;
+      setState(() => _estado = estado);
+    });
+
+    unawaited(_monitor.start());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_monitor.check());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if (_estado == InternetStatus.offline)
+          MaterialBanner(
+            content: const Text(
+              'Sin Internet. Esperando que vuelva la conexión.',
+            ),
+            leading: const Icon(Icons.wifi_off),
+            actions: [
+              TextButton(
+                onPressed: () => unawaited(_monitor.check()),
+                child: const Text('Reintentar'),
+              ),
+            ],
+          ),
+        Expanded(child: widget.child),
+      ],
+    );
+  }
+
+  Future<void> _cerrarMonitor() async {
+    await _escucha.cancel();
+    await _monitor.dispose();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(_cerrarMonitor());
+    super.dispose();
+  }
+}
+```
+
+La parte `changes.listen(...)` escucha los cambios. `setState` actualiza lo que
+se ve en pantalla. `mounted` evita actualizar un widget que ya se cerró.
+También se revisa la conexión al volver a la app y se cancela la escucha cuando
+el widget se cierra.
+
+### 3. Úsalo en tu pantalla
+
+Este `lib/main.dart` es una app pequeña y completa. Sustituye el texto del centro
+por el contenido de tu pantalla:
+
+```dart
+import 'package:flutter/material.dart';
+
+import 'aviso_de_internet.dart';
+
+void main() {
+  runApp(
+    MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: const Text('Mi aplicación')),
+        body: const AvisoDeInternet(
+          child: Center(child: Text('Aquí va el contenido de tu pantalla')),
+        ),
+      ),
+    ),
+  );
+}
+```
+
+Ejecuta `flutter run` para abrirla.
+
+### Qué vas a ver y cómo probarlo
+
+- Al abrir la app, todavía se está revisando la conexión. No aparece un aviso de
+  desconexión hasta que se confirme el resultado.
+- Si no hay Internet, aparece el mensaje **«Sin Internet»** con **«Reintentar»**.
+- Si la conexión vuelve, el aviso desaparece automáticamente.
+- Para probar los dos casos, desactiva Wi-Fi y datos móviles y luego vuelve a
+  activarlos. La detección puede tardar unos segundos: la librería confirma los
+  fallos y revisa cada cierto tiempo.
+
+Este widget crea su propio monitor y lo detiene al cerrar la pantalla. Si quieres
+compartir la conexión en toda la app, crea **un solo monitor** en la parte que
+permanece activa mientras se usa la app y comparte su respuesta entre pantallas.
+No crees el monitor dentro de `build()` ni cierres desde una pantalla un monitor
+que también usan otras.
+
+En Android, habilita Internet en `android/app/src/main/AndroidManifest.xml`,
+dentro de `<manifest>` y fuera de `<application>`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+En macOS, habilita las conexiones de red salientes de la app. Para Flutter web,
+consulta «Uso en páginas web y otras apps» más abajo: las direcciones de revisión
+deben permitir consultas desde tu página.
 
 ## Qué significa tener Internet en esta librería
 
