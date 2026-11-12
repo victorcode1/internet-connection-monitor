@@ -1,0 +1,19 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Internet Connection Monitor",
+  "description": "Framework-independent Internet reachability monitoring for Dart and Flutter. Confirms real Internet access (not just Wi-Fi) with serialized HTTP checks, periodic recovery, and a transition stream that reports online/offline/unknown states.",
+  "folders": [],
+  "excludeFolders": ["test", ".github"],
+  "excludeFiles": ["CHANGELOG.md"],
+  "rules": [
+    "InternetStatus starts as unknown until the first check completes; read monitor.status for the current state.",
+    "Subscribe to monitor.changes before calling start(); changes is a broadcast stream that emits only transitions (no duplicates, no replay of the current state).",
+    "Call start() to begin periodic checks, or call check() alone as a one-shot check or for a 'Retry' button.",
+    "Always call dispose() when finished; after dispose, start() and check() throw a StateError.",
+    "By default two consecutive failures (failureThreshold = 2) are required before confirming offline; a single failure is not enough.",
+    "A custom probe owns its own resources, must finish within checkTimeout, and its exceptions count as failed checks.",
+    "networkChanges feeds interface events (e.g. connectivity changes); interface availability alone never proves Internet access.",
+    "The built-in HTTP probe requires an exact 204 response from a Google or Cloudflare endpoint; captive-portal redirects or login pages do not satisfy it.",
+    "The library has no Flutter dependency and ships no widgets; it works in both Dart and Flutter apps."
+  ]
+}
